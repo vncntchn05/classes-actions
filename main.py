@@ -72,75 +72,7 @@ def spotcheck2(level, sess, subject, cournum, classnum):
                     datalist.append(t)
 
         wanti = datalist.index(classnum)
-        #print(int(datalist[wanti + 6]) + int(datalist[wanti + 10]) - int(datalist[wanti + 11]))
-        if int(datalist[wanti + 5]) > int(datalist[wanti + 6]) + int(datalist[wanti + 10]) - int(datalist[wanti + 11]):
-            return True, "There is an open spot for " + subject + " " + cournum + " (" + classnum + ")"
-        return False, ""
-    return False, ""
-
-def spotcheck3(level, sess, subject, cournum, classnum):
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-    }
-
-    data = {
-        'level': level,
-        'sess': sess,
-        'subject': subject,
-        'cournum': cournum,
-    }
-
-    response = requests.post('https://classes.uwaterloo.ca/cgi-bin/cgiwrap/infocour/salook.pl', headers=headers, data=data, verify=False)
-
-    if response != None:
-        html = "" + response.text
-
-        soup = BeautifulSoup(html, 'html.parser')
-
-        datalist = []
-
-        for data in soup.find_all('td'):
-            if data.string is not None:
-                t = re.sub('[^0-9a-zA-Z]+', '', data.string)
-                if t != '':
-                    datalist.append(t)
-
-        wanti = datalist.index(classnum)
-        #print(int(datalist[wanti + 7]) + int(datalist[wanti + 11]) - int(datalist[wanti + 12]))
-        if int(datalist[wanti + 6]) > int(datalist[wanti + 7]) + int(datalist[wanti + 11]) - int(datalist[wanti + 12]):
-            return True, "There is an open spot for " + subject + " " + cournum + " (" + classnum + ")"
-        return False, ""
-    return False, ""
-
-def spotcheck4(level, sess, subject, cournum, classnum):
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-    }
-
-    data = {
-        'level': level,
-        'sess': sess,
-        'subject': subject,
-        'cournum': cournum,
-    }
-
-    response = requests.post('https://classes.uwaterloo.ca/cgi-bin/cgiwrap/infocour/salook.pl', headers=headers, data=data, verify=False)
-
-    if response != None:
-        html = "" + response.text
-
-        soup = BeautifulSoup(html, 'html.parser')
-
-        datalist = []
-
-        for data in soup.find_all('td'):
-            if data.string is not None:
-                t = re.sub('[^0-9a-zA-Z]+', '', data.string)
-                if t != '':
-                    datalist.append(t)
-
-        wanti = datalist.index(classnum)
-        if int(datalist[wanti + 4]) > int(datalist[wanti + 5]):
+        if (int(datalist[wanti + 5]) > int(datalist[wanti + 6])):
             return True, "There is an open spot for " + subject + " " + cournum + " (" + classnum + ")"
         return False, ""
     return False, ""
@@ -168,20 +100,28 @@ message["From"] = sender_email
 message["To"] = receiver_email
 
 level = "under"
-sess = "1245"
-subject = "MATH"
+sess = "1259"
+subject = "CS"
 cournum = "239"
 classnum = "3761"
 
-p = spotcheck(level, sess, subject, cournum, classnum)[0]
-q = spotcheck(level, sess, subject, cournum, "3762")[0]
-r = spotcheck2(level, sess, subject, cournum, "3868")[0]
-s = spotcheck3(level, sess, subject, cournum, "3887")[0]
-t1 = spotcheck4(level, sess, subject, cournum, "3767")[0]
-t2 = spotcheck4(level, sess, subject, cournum, "3869")[0]
+p = spotcheck2(level, sess, subject, "341", "6933")[0]
+q = spotcheck2(level, sess, subject, "479", "8889")[0]
 
-if p and (t1 or t2):
-    text = spotcheck(level, sess, subject, cournum, classnum)[1]
+if p:
+    text = spotcheck2(level, sess, subject, "341", "6933")[1]
+
+    part1 = MIMEText(text, "plain")
+
+    message.attach(part1)
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+
+if q:
+    text = spotcheck2(level, sess, subject, "479", "8889")[1]
 
     part1 = MIMEText(text, "plain")
 
