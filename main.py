@@ -106,22 +106,9 @@ cournum = "239"
 classnum = "3761"
 
 p = spotcheck2(level, sess, subject, "341", "6933")[0]
-q = spotcheck2(level, sess, subject, "479", "8889")[0]
 
 if p:
     text = spotcheck2(level, sess, subject, "341", "6933")[1]
-
-    part1 = MIMEText(text, "plain")
-
-    message.attach(part1)
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message.as_string())
-
-if q:
-    text = spotcheck2(level, sess, subject, "479", "8889")[1]
 
     part1 = MIMEText(text, "plain")
 
